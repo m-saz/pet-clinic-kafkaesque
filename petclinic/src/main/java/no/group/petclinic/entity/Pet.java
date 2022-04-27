@@ -3,8 +3,10 @@ package no.group.petclinic.entity;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,6 +16,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +42,13 @@ public class Pet {
 	@JoinColumn(name="type_id")
 	private Type type;
 	
-	@OneToMany
+	@ManyToOne
+	@JoinColumn(name="owner_id")
+	@ToString.Exclude
+	@JsonIgnore
+	private Owner owner;
+	
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name="pet_id")
 	private List<Visit> visits;
 	
