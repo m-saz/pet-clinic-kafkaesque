@@ -14,7 +14,6 @@ import no.group.petclinic.service.VetService;
 @RestController
 @RequestMapping("/api/vets")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class VetController {
 	
 	private final VetService vetService;
