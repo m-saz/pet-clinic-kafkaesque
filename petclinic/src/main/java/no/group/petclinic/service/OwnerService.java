@@ -12,5 +12,9 @@ public interface OwnerService {
 	public List<OwnerSlim> searchOwners(String keyword);
 	
 	public void saveOwner(Owner owner);
+
+	public Owner getOwner(String ownerId);
+
+	public void deleteOwner(String ownerId);
 	
 }
