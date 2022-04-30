@@ -48,8 +48,8 @@ public class Pet {
 	@JsonIgnore
 	private Owner owner;
 	
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name="pet_id")
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL,
+				mappedBy = "pet", orphanRemoval = true)
 	private List<Visit> visits;
 	
 }

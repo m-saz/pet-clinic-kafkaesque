@@ -16,5 +16,7 @@ public interface OwnerService {
 	public Owner getOwner(String ownerId);
 
 	public void deleteOwner(String ownerId);
+
+	public void updateOwner(String ownerId, Owner owner);
 	
 }

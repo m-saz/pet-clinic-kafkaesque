@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,16 +40,22 @@ public class OwnerController {
 		return ownerService.searchOwners(keyword);
 	}
 	
-	@PostMapping
-	public void processOwner(@RequestBody Owner owner) {
-		logger.info(owner.toString());
-		ownerService.saveOwner(owner);
-	}
-	
 	@GetMapping("/{id}")
 	public Owner getOwner(@PathVariable String id) {
 		
 		return ownerService.getOwner(id);
+	}
+	
+	@PostMapping
+	public void processOwner(@RequestBody Owner owner) {
+		logger.info("{}",owner);
+		ownerService.saveOwner(owner);
+	}
+	
+	@PutMapping("/{id}")
+	public void updateOwner(@PathVariable String id, @RequestBody Owner owner) {
+		logger.info("{} {}",id, owner);
+		ownerService.updateOwner(id, owner);
 	}
 	
 	@DeleteMapping("/{id}")

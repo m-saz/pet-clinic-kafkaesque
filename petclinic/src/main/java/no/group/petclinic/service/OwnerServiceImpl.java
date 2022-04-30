@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import no.group.petclinic.dto.OwnerSlim;
 import no.group.petclinic.entity.Owner;
 import no.group.petclinic.entity.Pet;
+import no.group.petclinic.entity.Visit;
 import no.group.petclinic.exception.OwnerNotFoundException;
 import no.group.petclinic.repository.OwnerRepository;
 
@@ -31,9 +32,11 @@ public class OwnerServiceImpl implements OwnerService {
 	@Override
 	@Transactional
 	public void saveOwner(Owner owner) {
+		//Set foreign keys
 		for(Pet tempPet: owner.getPets()) {
 			tempPet.setOwner(owner);
 		}
+		
 		ownerRepository.save(owner);
 	}
 
@@ -58,6 +61,29 @@ public class OwnerServiceImpl implements OwnerService {
 			throw new OwnerNotFoundException("Can't find Owner with id: "+ownerId);
 		}
 		ownerRepository.deleteById(id);
+	}
+
+	@Override
+	@Transactional
+	public void updateOwner(String ownerId, Owner owner) {
+		Owner existingOwner = null;
+		try {
+			Integer id = Integer.parseInt(ownerId);
+			existingOwner = ownerRepository.findById(id).get();
+		}
+		catch(Exception e) {
+			throw new OwnerNotFoundException("Can't find Owner with id: "+ownerId);
+		}
+		
+		//Set foreign keys
+		for(Pet pet: owner.getPets()) {
+			for(Visit visit: pet.getVisits()) {
+				visit.setPet(pet);
+			}
+			pet.setOwner(owner);
+		}
+		
+		ownerRepository.save(owner);
 	}
 
 }
