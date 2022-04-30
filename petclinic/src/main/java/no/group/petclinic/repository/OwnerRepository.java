@@ -15,12 +15,12 @@ public interface OwnerRepository extends JpaRepository<Owner, Integer> {
 	
 	@Query("SELECT new no.group.petclinic.dto.OwnerSlim("
 			+ "o.id, o.firstName, o.lastName, o.phoneNumber, o.email) "
-			+ "FROM Owner o")
+			+ "FROM Owner o ORDER BY o.lastName")
 	List<OwnerSlim> findOwners();
 	
 	@Query("SELECT new no.group.petclinic.dto.OwnerSlim("
 			+ "o.id, o.firstName, o.lastName, o.phoneNumber, o.email) "
 			+ "FROM Owner o WHERE lower(o.firstName) LIKE lower(concat('%',:keyword,'%')) "
-			+ "OR lower(o.lastName) LIKE lower(concat('%',:keyword,'%'))")
+			+ "OR lower(o.lastName) LIKE lower(concat('%',:keyword,'%')) ORDER BY o.lastName")
 	List<OwnerSlim> findOwnersByFirstNameOrLastName(@Param("keyword") String keyword);
 }
