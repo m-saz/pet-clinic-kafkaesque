@@ -10,8 +10,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		
-		http.cors()
-			.and()
+		http.authorizeRequests()
+				.antMatchers("/**")
+					.access("hasIpAddress('127.0.0.1') or hasIpAddress('::1') or isAuthenticated()")
+				.anyRequest().authenticated()
+				.and()
+			.formLogin()
+				.permitAll()
+				.and()
+			.cors()
+				.and()
 			.csrf().disable();		
 	}
 
