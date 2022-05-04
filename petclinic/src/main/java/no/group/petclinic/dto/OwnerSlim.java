@@ -16,5 +16,5 @@ public class OwnerSlim {
 	private String phoneNumber;
 	
 	private String email;
-	
+
 }

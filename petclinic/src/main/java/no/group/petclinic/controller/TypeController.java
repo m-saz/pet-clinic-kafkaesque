@@ -2,6 +2,7 @@ package no.group.petclinic.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,8 +19,9 @@ public class TypeController {
 	private final TypeService typeService;
 	
 	@GetMapping
-	public List<Type> getTypes(){
-		return typeService.getTypes();
+	public ResponseEntity<List<Type>> getTypes(){
+		List<Type> types = typeService.getTypes();
+		return ResponseEntity.ok().body(types);
 	}
 	
 }
