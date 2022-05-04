@@ -1,6 +1,7 @@
 package no.group.petclinic.service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +22,7 @@ public class OwnerServiceImpl implements OwnerService {
 	
 	@Override
 	public List<OwnerSlim> getOwners() {
-		return ownerRepository.findOwners();
+		return ownerRepository.findAllOwners();
 	}
 
 	@Override
@@ -47,7 +48,7 @@ public class OwnerServiceImpl implements OwnerService {
 			Integer id = Integer.parseInt(ownerId);
 			owner = ownerRepository.findById(id).get();
 		}
-		catch(Exception e) {
+		catch(NoSuchElementException|NumberFormatException e) {
 			throw new OwnerNotFoundException("Can't find Owner with id: "+ownerId);
 		}
 		
@@ -56,24 +57,16 @@ public class OwnerServiceImpl implements OwnerService {
 
 	@Override
 	public void deleteOwner(String ownerId) {
-		Integer id = Integer.parseInt(ownerId);
-		if(!(ownerRepository.existsById(id))) {
-			throw new OwnerNotFoundException("Can't find Owner with id: "+ownerId);
-		}
-		ownerRepository.deleteById(id);
+		Owner existingOwner = getOwner(ownerId);
+		ownerRepository.deleteById(existingOwner.getId());
 	}
 
 	@Override
 	@Transactional
 	public void updateOwner(String ownerId, Owner owner) {
-		Owner existingOwner = null;
-		try {
-			Integer id = Integer.parseInt(ownerId);
-			existingOwner = ownerRepository.findById(id).get();
-		}
-		catch(Exception e) {
-			throw new OwnerNotFoundException("Can't find Owner with id: "+ownerId);
-		}
+		Owner existingOwner = getOwner(ownerId);
+		
+		owner.setId(existingOwner.getId());
 		
 		//Set foreign keys
 		for(Pet pet: owner.getPets()) {
