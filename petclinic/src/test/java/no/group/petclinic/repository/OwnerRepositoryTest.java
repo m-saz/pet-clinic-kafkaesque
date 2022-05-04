@@ -35,7 +35,7 @@ public class OwnerRepositoryTest {
 	void itShouldFindAllOwners() {
 		
 		//given
-		Owner owner = createOwnerWithName("Test","Subject","phone","email");
+		Owner owner = createOwnerWithNameAndContacts("Test","Subject","phone","email");
 		saveToDatabase(owner);
 		
 		//when
@@ -52,9 +52,9 @@ public class OwnerRepositoryTest {
 	void itShouldFindOwnersByKeyword() {
 		
 		//given
-		Owner ownerFound = createOwnerWithName("Test","Subject","phone","email");
-		Owner ownerNotFound = createOwnerWithName("Test","Object","phon","emai");
-		Owner ownerFoundToo = createOwnerWithName("Subj","Testect","pho","ema");
+		Owner ownerFound = createOwnerWithNameAndContacts("Test","Subject","phone","email");
+		Owner ownerNotFound = createOwnerWithNameAndContacts("Test","Object","phon","emai");
+		Owner ownerFoundToo = createOwnerWithNameAndContacts("Subj","Testect","pho","ema");
 		saveToDatabase(ownerFound, ownerNotFound, ownerFoundToo);
 		
 		//when
@@ -66,7 +66,7 @@ public class OwnerRepositoryTest {
 		assertThat(actual).containsExactly(expected, expectedToo);
 	}
 	
-	private Owner createOwnerWithName(String firstName, String lastName,
+	private Owner createOwnerWithNameAndContacts(String firstName, String lastName,
 					String phoneNumber, String email) {
 		Owner owner = new Owner();
 		owner.setFirstName(firstName);
