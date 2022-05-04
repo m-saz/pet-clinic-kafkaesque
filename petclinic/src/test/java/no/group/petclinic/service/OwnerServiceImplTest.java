@@ -1,11 +1,14 @@
 package no.group.petclinic.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,13 +16,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import no.group.petclinic.entity.Owner;
 import no.group.petclinic.entity.Pet;
+import no.group.petclinic.entity.Visit;
 import no.group.petclinic.exception.OwnerNotFoundException;
 import no.group.petclinic.repository.OwnerRepository;
 
@@ -59,29 +61,45 @@ public class OwnerServiceImplTest {
 		underTest.searchOwners(keyword);
 		
 		//then
-		ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
 		verify(ownerRepository).
-				findOwnersByFirstNameOrLastName(argumentCaptor.capture());
-		String capturedKeyword = argumentCaptor.getValue();
-		assertThat(capturedKeyword).isEqualTo(keyword);
+				findOwnersByFirstNameOrLastName(keyword);
 		
 	}
 	
-	@Test
-	@DisplayName("saveOwner() -> save() method is called with correct owner")
-	void canSaveOwner() {
+	@Nested
+	@DisplayName("saveOwner() -> ")
+	class SaveOwnerTest{
 		
-		//given
-		Owner owner = createOwner("Test", "Subject", "Phone Number", "Email");
+		@Test
+		@DisplayName("save() method is called with correct owner")
+		void canSaveOwner() {
+			
+			//given
+			Owner owner = createOwner("Test", "Subject", "Phone Number", "Email");
+			
+			//when
+			underTest.saveOwner(owner);
+			
+			//then
+			verify(ownerRepository).save(owner);
+			
+		}
 		
-		//when
-		underTest.saveOwner(owner);
-		
-		//then
-		ArgumentCaptor<Owner> argumentCaptor = ArgumentCaptor.forClass(Owner.class);
-		verify(ownerRepository).save(argumentCaptor.capture());
-		Owner capturedOwner = argumentCaptor.getValue();
-		assertThat(capturedOwner).isEqualTo(owner);
+		@Test
+		@DisplayName("Pet.setOwner() method is called with correct owner")
+		void canSetOwner() {
+			
+			//given
+			Owner owner = createOwner("Test", "Subject", "Phone Number", "Email");
+			Pet mockPet = mock(Pet.class);
+			owner.getPets().add(mockPet);
+			
+			//when
+			underTest.saveOwner(owner);
+			
+			//then
+			verify(mockPet, times(1)).setOwner(owner);
+		}
 		
 	}
 	
@@ -102,11 +120,7 @@ public class OwnerServiceImplTest {
 			underTest.getOwner(id);
 			
 			//then
-			ArgumentCaptor<Integer> argumentCaptor =
-							ArgumentCaptor.forClass(Integer.class);
-			verify(ownerRepository).findById(argumentCaptor.capture());
-			Integer capturedInteger = argumentCaptor.getValue();
-			assertThat(capturedInteger).isEqualTo(23);
+			verify(ownerRepository).findById(23);
 		}
 		
 		@Test
@@ -156,31 +170,58 @@ public class OwnerServiceImplTest {
 		underTest.deleteOwner(ownerId);
 		
 		//then
-		ArgumentCaptor<Integer> argumentCaptor = ArgumentCaptor.forClass(Integer.class);
-		verify(ownerRepository).deleteById(argumentCaptor.capture());
-		Integer capturedInteger = argumentCaptor.getValue();
-		assertThat(capturedInteger).isEqualTo(id);
+		verify(ownerRepository).deleteById(id);
 	}
 	
-	@Test
-	@DisplayName("updateOwner() -> save() method is called with correct owner")
-	void canUpdateOwner() {
+	@Nested
+	@DisplayName("updateOwner() -> ")
+	class UpdateOwnerTest{
 		
-		//given
-		String ownerId = "123";
-		Integer id = 123;
-		Owner owner = createOwner("First", "Last", "Phone", "Email");
-		owner.setId(id);
-		when(ownerRepository.findById(id)).thenReturn(Optional.of(owner));
+		@Test
+		@DisplayName("save() method is called with correct owner")
+		void canUpdateOwner() {
+			
+			//given
+			String ownerId = "123";
+			Integer id = 123;
+			Owner owner = createOwner("First", "Last", "Phone", "Email");
+			owner.setId(id);
+			when(ownerRepository.findById(id)).thenReturn(Optional.of(owner));
+			
+			//when
+			underTest.updateOwner(ownerId, owner);
+			
+			//then
+			verify(ownerRepository).save(owner);
+		}
 		
-		//when
-		underTest.updateOwner(ownerId, owner);
+		@Test
+		@DisplayName("Pet.setOwner() and Visit.setPet() methods are called")
+		void canSetOwnerAndSetPet() {
+			
+			//given
+			String ownerId = "123";
+			Integer id = 123;
+			
+			Visit visit = mock(Visit.class);
+			
+			Pet pet = spy(Pet.class);
+			pet.setVisits(List.of(visit));
+			
+			Owner owner = createOwner("First", "Last", "Phone", "Email");
+			owner.setId(id);
+			owner.getPets().add(pet);
+			
+			when(ownerRepository.findById(id)).thenReturn(Optional.of(owner));
+			
+			//when
+			underTest.updateOwner(ownerId, owner);
+			
+			//then
+			verify(pet).setOwner(owner);
+			verify(visit).setPet(pet);
+		}
 		
-		//then
-		ArgumentCaptor<Owner> argumentCaptor = ArgumentCaptor.forClass(Owner.class);
-		verify(ownerRepository).save(argumentCaptor.capture());
-		Owner capturedOwner = argumentCaptor.getValue();
-		assertThat(capturedOwner).isEqualTo(owner);
 	}
 	
 	private Owner createOwner(String firstName, String lastName,
