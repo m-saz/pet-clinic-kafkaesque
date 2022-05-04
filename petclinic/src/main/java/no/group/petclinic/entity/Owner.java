@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -23,6 +24,7 @@ import lombok.ToString;
 @Table(name = "owners")
 @Getter
 @Setter
+@EqualsAndHashCode
 @ToString
 public class Owner {
 	
