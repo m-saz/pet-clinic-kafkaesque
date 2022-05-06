@@ -33,13 +33,6 @@ class VetControllerTest {
 	@Autowired
 	private MockMvc mvc;
 	
-	private VetController underTest;
-	
-	@BeforeEach
-	void setUp() {
-		underTest = new VetController(vetService);
-	}
-
 	@Test
 	@DisplayName("getVets() -> given vets will return json array")
 	void canReturnVetsJsonArray() throws Exception {
