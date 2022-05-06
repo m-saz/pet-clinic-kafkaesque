@@ -5,6 +5,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -18,8 +19,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -41,13 +40,6 @@ class OwnerControllerTest {
 	
 	@Autowired
 	private MockMvc mockMvc;
-	
-	private OwnerController underTest;
-	
-	@BeforeEach
-	void setup() {
-		underTest = new OwnerController(ownerService);
-	}
 	
 	@Test
 	@DisplayName("getOwners() -> given Owners will return json array")
@@ -124,7 +116,8 @@ class OwnerControllerTest {
 		//then
 		mockMvc.perform(post("/api/owners")
 				.content(asJsonString(owner))
-				.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON)
+				.with(csrf()))
 				.andExpect(status().isNoContent());
 		verify(ownerService).saveOwner(owner);
 		
@@ -143,7 +136,8 @@ class OwnerControllerTest {
 		//then
 		mockMvc.perform(put("/api/owners/"+ownerId)
 				.content(asJsonString(owner))
-				.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON)
+				.with(csrf()))
 				.andExpect(status().isNoContent());
 		verify(ownerService).updateOwner(ownerId, owner);
 		
@@ -159,7 +153,8 @@ class OwnerControllerTest {
 		
 		//when
 		//then
-		mockMvc.perform(delete("/api/owners/"+ownerId))
+		mockMvc.perform(delete("/api/owners/"+ownerId)
+				.with(csrf()))
 				.andExpect(status().isNoContent());
 		verify(ownerService).deleteOwner(ownerId);
 		

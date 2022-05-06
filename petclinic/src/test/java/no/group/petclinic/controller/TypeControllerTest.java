@@ -31,13 +31,6 @@ class TypeControllerTest {
 	
 	@Autowired
 	private MockMvc mvc;
-	
-	private TypeController underTest;
-	
-	@BeforeEach
-	void setUp() {
-		underTest = new TypeController(typeService);
-	}
 
 	@Test
 	@DisplayName("getTypes() -> given types will return json array")
