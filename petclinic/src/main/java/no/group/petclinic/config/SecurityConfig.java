@@ -3,6 +3,8 @@ package no.group.petclinic.config;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -12,7 +14,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		
 		http.authorizeRequests()
 				.antMatchers("/**")
-					.access("hasIpAddress('127.0.0.1') or hasIpAddress('::1') or isAuthenticated()")
+					.access("hasIpAddress('127.0.0.1') or hasIpAddress('::1') "
+							+ "or isAuthenticated()")
 				.anyRequest().authenticated()
 				.and()
 			.formLogin()
@@ -20,7 +23,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.and()
 			.cors()
 				.and()
-			.csrf().disable();		
+			.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());	
 	}
 
 	
