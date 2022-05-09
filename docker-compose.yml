@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  app:
+    image: 'petclinic:latest'
+    build:
+      context: ./petclinic
+    ports:
+      - 8444:8443
+    depends_on:
+      - postgres
+      - keycloak
+    restart: unless-stopped
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/petclinic
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_SECURITY_USER_NAME=${SPRING_USERNAME}
+      - SPRING_SECURITY_USER_PASSWORD=${SPRING_PASSWORD}
+          
+  postgres:
+    image: 'postgres:${POSTGRES_VERSION}'
+    volumes:
+      - ./postgres/sql-init:/docker-entrypoint-initdb.d
+      - ./postgres/db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=petclinic
+      - PGDATA=/var/lib/postgresql/data/pgdata
+
+  keycloak:
+    image: 'keycloak-custom'
+    build: ./keycloak
+    ports:
+      - 8443:8443
+    environment:
+      - PROXY_ADDRESS_FORWARDING=true
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=password
+      - KEYCLOAK_LOGLEVEL=ALL
+    depends_on:
+      - keycloak-postgres
+    command: >
+      start --auto-build
+      --db=postgres
+      --db-url=jdbc:postgresql://keycloak-postgres:5432/keycloak
+      --db-username=keycloak --db-password=keycloak
+
+  keycloak-postgres:
+    image: 'postgres:${POSTGRES_VERSION}'
+    volumes:
+      - ./keycloak/kc_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=keycloak
+      - POSTGRES_DB=keycloak
+      - PGDATA=/var/lib/postgresql/data/pgdata
