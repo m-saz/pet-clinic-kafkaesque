@@ -6,7 +6,7 @@ services:
     build:
       context: ./petclinic
     ports:
-      - 8444:8443
+      - 8444:8444
     depends_on:
       - postgres
       - keycloak
@@ -15,8 +15,6 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/petclinic
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
-      - SPRING_SECURITY_USER_NAME=${SPRING_USERNAME}
-      - SPRING_SECURITY_USER_PASSWORD=${SPRING_PASSWORD}
           
   postgres:
     image: 'postgres:${POSTGRES_VERSION}'
@@ -30,22 +28,23 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
 
   keycloak:
-    image: 'keycloak-custom'
-    build: ./keycloak
+    image: jboss/keycloak:11.0.2
     ports:
       - 8443:8443
+    volumes:
+      - ./keycloak/certs:/etc/x509/https
+      - ./keycloak/ca_certs:/var/ca_certs
     environment:
-      - PROXY_ADDRESS_FORWARDING=true
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=password
-      - KEYCLOAK_LOGLEVEL=ALL
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - DB_VENDOR=postgres
+      - DB_ADDR=keycloak-postgres
+      - DB_DATABASE=keycloak
+      - DB_USER=keycloak
+      - DB_PASSWORD=keycloak
+      - X509_CA_BUNDLE=/var/ca_certs/petclinic.crt
     depends_on:
       - keycloak-postgres
-    command: >
-      start --auto-build
-      --db=postgres
-      --db-url=jdbc:postgresql://keycloak-postgres:5432/keycloak
-      --db-username=keycloak --db-password=keycloak
 
   keycloak-postgres:
     image: 'postgres:${POSTGRES_VERSION}'

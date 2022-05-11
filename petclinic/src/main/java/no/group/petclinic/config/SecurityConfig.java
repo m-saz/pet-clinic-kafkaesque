@@ -15,14 +15,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			 .anyRequest()
 			 	.authenticated()
 			 	.and()
-			 .formLogin()
-			 	.permitAll()
-			 	.and()
 			.cors()
 				.and()
 			.csrf()
 				.csrfTokenRepository(CookieCsrfTokenRepository
-						.withHttpOnlyFalse());	
+						.withHttpOnlyFalse())
+				.and()
+			.oauth2ResourceServer()
+				.jwt();
 	}
 
 	
