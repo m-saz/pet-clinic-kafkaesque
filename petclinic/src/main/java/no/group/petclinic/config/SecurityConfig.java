@@ -12,17 +12,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		
 		http.authorizeRequests()
-				.antMatchers("/**")
-					.access("hasIpAddress('127.0.0.1') or hasIpAddress('::1') "
-							+ "or isAuthenticated()")
-				.anyRequest().authenticated()
-				.and()
-			.formLogin()
-				.permitAll()
-				.and()
+			 .anyRequest()
+			 	.authenticated()
+			 	.and()
 			.cors()
 				.and()
-			.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());	
+			.csrf()
+				.csrfTokenRepository(CookieCsrfTokenRepository
+						.withHttpOnlyFalse())
+				.and()
+			.oauth2ResourceServer()
+				.jwt();
 	}
 
 	
