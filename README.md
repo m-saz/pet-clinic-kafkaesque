@@ -7,6 +7,8 @@ Uses 4 Docker containers:
 - keycloak: Keycloak server
 - keycloak-postgres: Postgres database holding keycloak data
 
-App and Keycloak server coomunicate using ssl
+App and Keycloak server coomunicate using SSL
+
+Run with `docker-compose up`
 
 Tests with JUnit, Mockito, H2 in-memory db
