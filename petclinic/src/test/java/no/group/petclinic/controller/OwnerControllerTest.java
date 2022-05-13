@@ -24,6 +24,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -51,26 +55,29 @@ class OwnerControllerTest {
 	@DisplayName("getOwners() -> ")
 	class GetOwnersTest{
 		
-//		@Test
-//		@DisplayName("given Owners will return json array")
-//		void getOwners_canReturnOwnersJsonArray() throws Exception {
-//			
-//			//given
-//			OwnerSlim owner = new OwnerSlim(3, "Paul", "Subject", "phone", "email");
-//			List<OwnerSlim> allOwners = List.of(owner);
-//			
-//			when(ownerService.getOwners()).thenReturn(allOwners);
-//			
-//			//when
-//			//then
-//			mockMvc.perform(get("/api/owners")
-//					.contentType(MediaType.APPLICATION_JSON)
-//					.with(jwt()))
-//					.andExpect(status().isOk())
-//					.andExpect(jsonPath("$", hasSize(1)))
-//					.andExpect(jsonPath("$[0].firstName", is(owner.getFirstName())));
-//			verify(ownerService, times(1)).getOwners();
-//		}
+		@Test
+		@DisplayName("given Owners will return json array")
+		void getOwners_canReturnOwnersJsonArray() throws Exception {
+			
+			//given
+			OwnerSlim owner = new OwnerSlim(3, "Paul", "Subject", "phone", "email");
+			List<OwnerSlim> owners = List.of(owner);
+			Pageable pageable = PageRequest.of(0, 10);
+			Page<OwnerSlim> ownersPage = new PageImpl<>(owners, pageable, owners.size());
+			
+			when(ownerService.getOwners(pageable)).thenReturn(ownersPage);
+			
+			//when
+			//then
+			mockMvc.perform(get("/api/owners")
+					.contentType(MediaType.APPLICATION_JSON)
+					.with(jwt()))
+					.andExpect(status().isOk())
+					.andExpect(jsonPath("$._embedded.ownerSlimList", hasSize(1)))
+					.andExpect(jsonPath("$._embedded.ownerSlimList[0].firstName",
+										is(owner.getFirstName())));
+			verify(ownerService, times(1)).getOwners(pageable);
+		}
 		
 		@Test
 		@DisplayName("given no JWT will return 401")
@@ -89,29 +96,33 @@ class OwnerControllerTest {
 	@DisplayName("searchOwners() -> ")
 	class SearchOwnersTest{
 		
-//		@Test
-//		@DisplayName("given Owners and keyword will return json array")
-//		void searchOwners_canFindAndReturnOwnersJsonArray() throws Exception {
-//			
-//			//given
-//			OwnerSlim owner = new OwnerSlim(12, "Test", "Smth", "phone", "email");
-//			List<OwnerSlim> foundOwners = List.of(owner);
-//			String keyword = "test";
-//			
-//			when(ownerService.searchOwners(keyword)).thenReturn(foundOwners);
-//			
-//			//when
-//			//then
-//			mockMvc.perform(get("/api/owners/search/"
-//					+ "findOwnersByFirstNameOrLastName?keyword="+keyword)
-//					.contentType(MediaType.APPLICATION_JSON)
-//					.with(jwt()))
-//					.andExpect(status().isOk())
-//					.andExpect(jsonPath("$", hasSize(1)))
-//					.andExpect(jsonPath("$[0].lastName", is(owner.getLastName())));
-//			verify(ownerService, times(1)).searchOwners(keyword);
-//			
-//		}
+		@Test
+		@DisplayName("given Owners and keyword will return json array")
+		void searchOwners_canFindAndReturnOwnersJsonArray() throws Exception {
+			
+			//given
+			OwnerSlim owner = new OwnerSlim(12, "Test", "Smth", "phone", "email");
+			List<OwnerSlim> foundOwners = List.of(owner);
+			Pageable pageable = PageRequest.of(0, 10);
+			Page<OwnerSlim> foundOwnersPage = 
+									new PageImpl<>(foundOwners, pageable, foundOwners.size());
+			String keyword = "test";
+			
+			when(ownerService.searchOwners(keyword, pageable)).thenReturn(foundOwnersPage);
+			
+			//when
+			//then
+			mockMvc.perform(get("/api/owners/search/"
+					+ "findOwnersByFirstNameOrLastName?keyword="+keyword)
+					.contentType(MediaType.APPLICATION_JSON)
+					.with(jwt()))
+					.andExpect(status().isOk())
+					.andExpect(jsonPath("$._embedded.ownerSlimList", hasSize(1)))
+					.andExpect(jsonPath("$._embedded.ownerSlimList[0].lastName",
+										is(owner.getLastName())));
+			verify(ownerService, times(1)).searchOwners(keyword, pageable);
+			
+		}
 		
 		@Test
 		@DisplayName("given no JWT will return 401")
