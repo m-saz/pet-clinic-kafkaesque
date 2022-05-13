@@ -1,9 +1,19 @@
 package no.group.petclinic.controller;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,21 +36,32 @@ import no.group.petclinic.service.OwnerService;
 public class OwnerController {
 	
 	private final OwnerService ownerService;
+	private final PagedResourcesAssembler<OwnerSlim> parAssembler;
 	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@GetMapping
-	public ResponseEntity<List<OwnerSlim>> getOwners() {
+	public ResponseEntity<PagedModel<EntityModel<OwnerSlim>>> getOwners(@PageableDefault Pageable pageable) {
 		
-		List<OwnerSlim> owners = ownerService.getOwners();
-		return ResponseEntity.ok().body(owners);
+		Page<OwnerSlim> ownersPage = ownerService.getOwners(pageable);
+		addSelfLinksToOwners(ownersPage);
+		Link selfLink = linkTo(methodOn(OwnerController.class).getOwners(pageable)).withSelfRel();
+		PagedModel<EntityModel<OwnerSlim>> ownerModel = parAssembler.toModel(ownersPage, selfLink);
+		
+		return ResponseEntity.ok().body(ownerModel);
 	}
-	
+
 	@GetMapping("/search/findOwnersByFirstNameOrLastName")
-	public ResponseEntity<List<OwnerSlim>> searchOwners(@RequestParam("keyword") String keyword) {
+	public ResponseEntity<PagedModel<EntityModel<OwnerSlim>>> searchOwners(@RequestParam("keyword") String keyword,
+														@PageableDefault Pageable pageable) {
 		
-		List<OwnerSlim> owners = ownerService.searchOwners(keyword);
-		return ResponseEntity.ok().body(owners);
+		Page<OwnerSlim> ownersPage = ownerService.searchOwners(keyword, pageable);
+		addSelfLinksToOwners(ownersPage);
+		Link selfLink = linkTo(methodOn(OwnerController.class).searchOwners(keyword, pageable))
+								.withSelfRel();
+		PagedModel<EntityModel<OwnerSlim>> ownerModel = parAssembler.toModel(ownersPage, selfLink);
+		
+		return ResponseEntity.ok().body(ownerModel);
 	}
 	
 	@GetMapping("/{id}")
@@ -70,4 +91,16 @@ public class OwnerController {
 		return ResponseEntity.noContent().build();
 	}
 	
+	private static void addSelfLinksToOwners(Page<OwnerSlim> ownersPage) {
+		
+		if(ownersPage.getContent() != null) {
+			for(final OwnerSlim owner : ownersPage.getContent()) {
+				
+				Link selfLink = linkTo(methodOn(OwnerController.class)
+										.getOwner(owner.getId().toString()))
+										.withSelfRel();
+				owner.add(selfLink);
+			}
+		}
+	}
 }

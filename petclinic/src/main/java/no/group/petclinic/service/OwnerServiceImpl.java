@@ -3,6 +3,9 @@ package no.group.petclinic.service;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,24 +22,22 @@ import no.group.petclinic.repository.OwnerRepository;
 public class OwnerServiceImpl implements OwnerService {
 
 	private final OwnerRepository ownerRepository;
-	
-	@Override
-	public List<OwnerSlim> getOwners() {
-		return ownerRepository.findAllOwners();
-	}
 
 	@Override
-	public List<OwnerSlim> searchOwners(String keyword) {
-		return ownerRepository.findOwnersByFirstNameOrLastName(keyword);
+	public Page<OwnerSlim> getOwners(Pageable pageable) {
+		return ownerRepository.findAllOwners(pageable);
+	}
+	
+	@Override
+	public Page<OwnerSlim> searchOwners(String keyword, Pageable pageable) {
+		return ownerRepository.findOwnersByFirstNameOrLastName(keyword, pageable);
 	}
 
 	@Override
 	@Transactional
 	public void saveOwner(Owner owner) {
-		//Set foreign keys
-		for(Pet tempPet: owner.getPets()) {
-			tempPet.setOwner(owner);
-		}
+
+		setForeignKeys(owner);
 		
 		ownerRepository.save(owner);
 	}
@@ -68,15 +69,20 @@ public class OwnerServiceImpl implements OwnerService {
 		
 		owner.setId(existingOwner.getId());
 		
-		//Set foreign keys
+		setForeignKeys(owner);
+		
+		ownerRepository.save(owner);
+	}
+
+	private static void setForeignKeys(Owner owner) {
 		for(Pet pet: owner.getPets()) {
-			for(Visit visit: pet.getVisits()) {
-				visit.setPet(pet);
+			if(pet.getVisits() != null) {
+				for(Visit visit: pet.getVisits()) {
+					visit.setPet(pet);
+				}
 			}
 			pet.setOwner(owner);
 		}
-		
-		ownerRepository.save(owner);
 	}
 
 }

@@ -38,33 +38,33 @@ public class OwnerServiceImplTest {
 		underTest = new OwnerServiceImpl(ownerRepository);
 	}
 	
-	@Test
-	@DisplayName("getOwners() -> findAllOwners() method is called")
-	void canGetAllOwners() {
-		
-		//when
-		underTest.getOwners();
-		
-		//then
-		verify(ownerRepository).findAllOwners();
-	}
+//	@Test
+//	@DisplayName("getOwners() -> findAllOwners() method is called")
+//	void canGetAllOwners() {
+//		
+//		//when
+//		underTest.getOwners();
+//		
+//		//then
+//		verify(ownerRepository).findAllOwners();
+//	}
 	
-	@Test
-	@DisplayName("searchOwners() -> findOwnersByFirstNameOrLastName() method is called"
-			+ "with correct keyword")
-	void canSearchOwners() {
-		
-		//given
-		String keyword = "test";
-		
-		//when
-		underTest.searchOwners(keyword);
-		
-		//then
-		verify(ownerRepository).
-				findOwnersByFirstNameOrLastName(keyword);
-		
-	}
+//	@Test
+//	@DisplayName("searchOwners() -> findOwnersByFirstNameOrLastName() method is called"
+//			+ "with correct keyword")
+//	void canSearchOwners() {
+//		
+//		//given
+//		String keyword = "test";
+//		
+//		//when
+//		underTest.searchOwners(keyword);
+//		
+//		//then
+//		verify(ownerRepository).
+//				findOwnersByFirstNameOrLastName(keyword);
+//		
+//	}
 	
 	@Nested
 	@DisplayName("saveOwner() -> ")

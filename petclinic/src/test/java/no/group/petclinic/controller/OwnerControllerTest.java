@@ -51,26 +51,26 @@ class OwnerControllerTest {
 	@DisplayName("getOwners() -> ")
 	class GetOwnersTest{
 		
-		@Test
-		@DisplayName("given Owners will return json array")
-		void getOwners_canReturnOwnersJsonArray() throws Exception {
-			
-			//given
-			OwnerSlim owner = new OwnerSlim(3, "Paul", "Subject", "phone", "email");
-			List<OwnerSlim> allOwners = List.of(owner);
-			
-			when(ownerService.getOwners()).thenReturn(allOwners);
-			
-			//when
-			//then
-			mockMvc.perform(get("/api/owners")
-					.contentType(MediaType.APPLICATION_JSON)
-					.with(jwt()))
-					.andExpect(status().isOk())
-					.andExpect(jsonPath("$", hasSize(1)))
-					.andExpect(jsonPath("$[0].firstName", is(owner.getFirstName())));
-			verify(ownerService, times(1)).getOwners();
-		}
+//		@Test
+//		@DisplayName("given Owners will return json array")
+//		void getOwners_canReturnOwnersJsonArray() throws Exception {
+//			
+//			//given
+//			OwnerSlim owner = new OwnerSlim(3, "Paul", "Subject", "phone", "email");
+//			List<OwnerSlim> allOwners = List.of(owner);
+//			
+//			when(ownerService.getOwners()).thenReturn(allOwners);
+//			
+//			//when
+//			//then
+//			mockMvc.perform(get("/api/owners")
+//					.contentType(MediaType.APPLICATION_JSON)
+//					.with(jwt()))
+//					.andExpect(status().isOk())
+//					.andExpect(jsonPath("$", hasSize(1)))
+//					.andExpect(jsonPath("$[0].firstName", is(owner.getFirstName())));
+//			verify(ownerService, times(1)).getOwners();
+//		}
 		
 		@Test
 		@DisplayName("given no JWT will return 401")
@@ -89,29 +89,29 @@ class OwnerControllerTest {
 	@DisplayName("searchOwners() -> ")
 	class SearchOwnersTest{
 		
-		@Test
-		@DisplayName("given Owners and keyword will return json array")
-		void searchOwners_canFindAndReturnOwnersJsonArray() throws Exception {
-			
-			//given
-			OwnerSlim owner = new OwnerSlim(12, "Test", "Smth", "phone", "email");
-			List<OwnerSlim> foundOwners = List.of(owner);
-			String keyword = "test";
-			
-			when(ownerService.searchOwners(keyword)).thenReturn(foundOwners);
-			
-			//when
-			//then
-			mockMvc.perform(get("/api/owners/search/"
-					+ "findOwnersByFirstNameOrLastName?keyword="+keyword)
-					.contentType(MediaType.APPLICATION_JSON)
-					.with(jwt()))
-					.andExpect(status().isOk())
-					.andExpect(jsonPath("$", hasSize(1)))
-					.andExpect(jsonPath("$[0].lastName", is(owner.getLastName())));
-			verify(ownerService, times(1)).searchOwners(keyword);
-			
-		}
+//		@Test
+//		@DisplayName("given Owners and keyword will return json array")
+//		void searchOwners_canFindAndReturnOwnersJsonArray() throws Exception {
+//			
+//			//given
+//			OwnerSlim owner = new OwnerSlim(12, "Test", "Smth", "phone", "email");
+//			List<OwnerSlim> foundOwners = List.of(owner);
+//			String keyword = "test";
+//			
+//			when(ownerService.searchOwners(keyword)).thenReturn(foundOwners);
+//			
+//			//when
+//			//then
+//			mockMvc.perform(get("/api/owners/search/"
+//					+ "findOwnersByFirstNameOrLastName?keyword="+keyword)
+//					.contentType(MediaType.APPLICATION_JSON)
+//					.with(jwt()))
+//					.andExpect(status().isOk())
+//					.andExpect(jsonPath("$", hasSize(1)))
+//					.andExpect(jsonPath("$[0].lastName", is(owner.getLastName())));
+//			verify(ownerService, times(1)).searchOwners(keyword);
+//			
+//		}
 		
 		@Test
 		@DisplayName("given no JWT will return 401")
