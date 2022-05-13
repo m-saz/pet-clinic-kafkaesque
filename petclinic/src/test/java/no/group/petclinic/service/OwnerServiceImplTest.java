@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import no.group.petclinic.entity.Owner;
 import no.group.petclinic.entity.Pet;
@@ -42,27 +44,31 @@ public class OwnerServiceImplTest {
 	@DisplayName("getOwners() -> findAllOwners() method is called")
 	void canGetAllOwners() {
 		
+		//given
+		Pageable pageable = PageRequest.of(0, 10);
+		
 		//when
-		underTest.getOwners();
+		underTest.getOwners(pageable);
 		
 		//then
-		verify(ownerRepository).findAllOwners();
+		verify(ownerRepository).findAllOwners(pageable);
 	}
 	
 	@Test
-	@DisplayName("searchOwners() -> findOwnersByFirstNameOrLastName() method is called"
-			+ "with correct keyword")
+	@DisplayName("searchOwners() -> given Pageable and keyword findOwnersByFirstNameOrLastName()"
+			+ " method is called with correct keyword")
 	void canSearchOwners() {
 		
 		//given
 		String keyword = "test";
+		Pageable pageable = PageRequest.of(0, 10);
 		
 		//when
-		underTest.searchOwners(keyword);
+		underTest.searchOwners(keyword, pageable);
 		
 		//then
 		verify(ownerRepository).
-				findOwnersByFirstNameOrLastName(keyword);
+				findOwnersByFirstNameOrLastName(keyword, pageable);
 		
 	}
 	

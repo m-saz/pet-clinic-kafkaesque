@@ -2,6 +2,8 @@ package no.group.petclinic.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,12 +18,13 @@ public interface OwnerRepository extends JpaRepository<Owner, Integer> {
 	@Query("SELECT new no.group.petclinic.dto.OwnerSlim("
 			+ "o.id, o.firstName, o.lastName, o.phoneNumber, o.email) "
 			+ "FROM Owner o ORDER BY o.lastName")
-	List<OwnerSlim> findAllOwners();
+	Page<OwnerSlim> findAllOwners(Pageable pageable);
 	
 	@Query("SELECT new no.group.petclinic.dto.OwnerSlim("
 			+ "o.id, o.firstName, o.lastName, o.phoneNumber, o.email) "
 			+ "FROM Owner o WHERE lower(o.firstName) LIKE lower(concat('%',:keyword,'%')) "
 			+ "OR lower(o.lastName) LIKE lower(concat('%',:keyword,'%')) "
 			+ "ORDER BY o.lastName")
-	List<OwnerSlim> findOwnersByFirstNameOrLastName(@Param("keyword") String keyword);
+	Page<OwnerSlim> findOwnersByFirstNameOrLastName(@Param("keyword") String keyword,
+													Pageable pageable);
 }

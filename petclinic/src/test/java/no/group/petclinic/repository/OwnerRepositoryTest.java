@@ -3,13 +3,15 @@ package no.group.petclinic.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashSet;
-import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
@@ -37,13 +39,14 @@ public class OwnerRepositoryTest {
 		//given
 		Owner owner = createOwnerWithNameAndContacts("Test","Subject","phone","email");
 		saveToDatabase(owner);
+		Pageable pageable = PageRequest.of(0, 10);
 		
 		//when
-		List<OwnerSlim> actual = underTest.findAllOwners();
+		Page<OwnerSlim> actual = underTest.findAllOwners(pageable);
 		
 		//then
 		OwnerSlim expected = new OwnerSlim(1,"Test","Subject","phone","email");
-		assertThat(actual).containsExactly(expected);
+		assertThat(actual.getContent()).containsExactly(expected);
 	}
 	
 	@Test
@@ -56,14 +59,15 @@ public class OwnerRepositoryTest {
 		Owner ownerNotFound = createOwnerWithNameAndContacts("Test","Object","phon","emai");
 		Owner ownerFoundToo = createOwnerWithNameAndContacts("Subj","Testect","pho","ema");
 		saveToDatabase(ownerFound, ownerNotFound, ownerFoundToo);
+		Pageable pageable = PageRequest.of(0, 10);
 		
 		//when
-		List<OwnerSlim> actual = underTest.findOwnersByFirstNameOrLastName("sub");
+		Page<OwnerSlim> actual = underTest.findOwnersByFirstNameOrLastName("sub", pageable);
 		
 		//then
 		OwnerSlim expected = new OwnerSlim(1,"Test","Subject","phone","email");
 		OwnerSlim expectedToo = new OwnerSlim(3, "Subj", "Testect", "pho", "ema");
-		assertThat(actual).containsExactly(expected, expectedToo);
+		assertThat(actual.getContent()).containsExactly(expected, expectedToo);
 	}
 	
 	private Owner createOwnerWithNameAndContacts(String firstName, String lastName,

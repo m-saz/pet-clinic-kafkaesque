@@ -2,14 +2,17 @@ package no.group.petclinic.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import no.group.petclinic.dto.OwnerSlim;
 import no.group.petclinic.entity.Owner;
 
 public interface OwnerService {
 	
-	public List<OwnerSlim> getOwners();
+	public Page<OwnerSlim> getOwners(Pageable pageable);
 	
-	public List<OwnerSlim> searchOwners(String keyword);
+	public Page<OwnerSlim> searchOwners(String keyword, Pageable pageable);
 	
 	public void saveOwner(Owner owner);
 
