@@ -73,8 +73,8 @@ class OwnerControllerTest {
 					.contentType(MediaType.APPLICATION_JSON)
 					.with(jwt()))
 					.andExpect(status().isOk())
-					.andExpect(jsonPath("$._embedded.ownerSlimList", hasSize(1)))
-					.andExpect(jsonPath("$._embedded.ownerSlimList[0].firstName",
+					.andExpect(jsonPath("$._embedded.owners", hasSize(1)))
+					.andExpect(jsonPath("$._embedded.owners[0].firstName",
 										is(owner.getFirstName())));
 			verify(ownerService, times(1)).getOwners(pageable);
 		}
@@ -117,8 +117,8 @@ class OwnerControllerTest {
 					.contentType(MediaType.APPLICATION_JSON)
 					.with(jwt()))
 					.andExpect(status().isOk())
-					.andExpect(jsonPath("$._embedded.ownerSlimList", hasSize(1)))
-					.andExpect(jsonPath("$._embedded.ownerSlimList[0].lastName",
+					.andExpect(jsonPath("$._embedded.owners", hasSize(1)))
+					.andExpect(jsonPath("$._embedded.owners[0].lastName",
 										is(owner.getLastName())));
 			verify(ownerService, times(1)).searchOwners(keyword, pageable);
 			
