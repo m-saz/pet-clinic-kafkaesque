@@ -9,6 +9,8 @@ Uses 4 Docker containers:
 
 App and Keycloak server coomunicate using SSL
 
-Run with `docker-compose up`
+Run with `docker-compose build && docker-compose up -d`
+
+You need to run [Frontend App](https://github.com/m-saz/pet-clinic-frontend) to gain access
 
 Tests with JUnit, Mockito, H2 in-memory db
