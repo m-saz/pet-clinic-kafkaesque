@@ -17,6 +17,11 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: https://keycloak:8443/auth/realms/petclinic/protocol/openid-connect/certs
+  kafka:
+    bootstrap-servers:
+    - kafka:9092
+    consumer:
+      group-id: petGroup
 
 server:
   port: 8444
