@@ -20,7 +20,7 @@ public class VetController {
 	private final KafkaVetService vetService;
 	
 	@GetMapping
-	public ResponseEntity<List<Vet>> getVets() throws InterruptedException, ExecutionException{
+	public ResponseEntity<List<Vet>> getVets(){
 		List<Vet> vets = vetService.getVets();
 		return ResponseEntity.ok().body(vets);
 	}

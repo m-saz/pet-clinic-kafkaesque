@@ -6,6 +6,6 @@ import no.group.petclinic.entity.Vet;
 
 public interface VetService {
 	
-	public void getVets(byte[] data);
+	public void getVets(byte[] correlationId);
 	
 }

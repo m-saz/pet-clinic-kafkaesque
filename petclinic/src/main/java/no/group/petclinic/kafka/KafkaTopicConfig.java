@@ -17,5 +17,15 @@ public class KafkaTopicConfig {
 	public NewTopic topic2() {
 		return TopicBuilder.name(VetTopicConstants.GET_VETS_REPLY).build();
 	}
+	
+	@Bean
+	public NewTopic topic3() {
+		return TopicBuilder.name(TypeTopicConstants.GET_TYPES).build();
+	}
+	
+	@Bean
+	public NewTopic topic4() {
+		return TopicBuilder.name(TypeTopicConstants.GET_TYPES_REPLY).build();
+	}
 
 }

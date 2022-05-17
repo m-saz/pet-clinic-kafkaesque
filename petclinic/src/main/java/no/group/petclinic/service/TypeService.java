@@ -5,5 +5,5 @@ import java.util.List;
 import no.group.petclinic.entity.Type;
 
 public interface TypeService {
-	public List<Type> getTypes();
+	public void getTypes(byte[] correlationId);
 }

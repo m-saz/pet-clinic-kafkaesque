@@ -23,13 +23,13 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import no.group.petclinic.entity.Type;
-import no.group.petclinic.service.TypeService;
+import no.group.petclinic.service.KafkaTypeService;
 
 @WebMvcTest(TypeController.class)
 class TypeControllerTest {
 
 	@MockBean
-	private TypeService typeService;
+	private KafkaTypeService typeService;
 	
 	@MockBean
 	private JwtDecoder jwtDecoder;

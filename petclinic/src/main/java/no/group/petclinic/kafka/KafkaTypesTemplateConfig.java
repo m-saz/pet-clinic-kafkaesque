@@ -11,32 +11,31 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 
-import no.group.petclinic.entity.Vet;
+import no.group.petclinic.entity.Type;
 
 @Configuration
-public class KafkaVetsTemplateConfig {
-	
+public class KafkaTypesTemplateConfig {
+
 	@Value("${kafka.group.id}")
 	private String groupId;
 
 	@Bean
-	public ReplyingKafkaTemplate<String, String, List<Vet>> vetsReplyingTemplate(
+	public ReplyingKafkaTemplate<String, String, List<Type>> typesReplyingTemplate(
 			ProducerFactory<String, String> pf,
-			ConcurrentKafkaListenerContainerFactory<String, List<Vet>> factory){
+			ConcurrentKafkaListenerContainerFactory<String, List<Type>> factory){
 		
-		ConcurrentMessageListenerContainer<String, List<Vet>> repliesContainer =
-				factory.createContainer(VetTopicConstants.GET_VETS_REPLY);
+		ConcurrentMessageListenerContainer<String, List<Type>> repliesContainer =
+				factory.createContainer(TypeTopicConstants.GET_TYPES_REPLY);
 		repliesContainer.getContainerProperties().setMissingTopicsFatal(false);
 		repliesContainer.getContainerProperties().setGroupId(groupId);
-		return new ReplyingKafkaTemplate<String, String, List<Vet>>(pf, repliesContainer);
+		return new ReplyingKafkaTemplate<String, String, List<Type>>(pf, repliesContainer);
 	}
 	
 	@Bean
-	public KafkaTemplate<String, List<Vet>> vetsTemplate(ProducerFactory<String,List<Vet>> pf,
-			ConcurrentKafkaListenerContainerFactory<String, List<Vet>> factory){
-		KafkaTemplate<String, List<Vet>> kafkaTemplate = new KafkaTemplate<>(pf);
+	public KafkaTemplate<String, List<Type>> typesTemplate(ProducerFactory<String,List<Type>> pf,
+			ConcurrentKafkaListenerContainerFactory<String, List<Type>> factory){
+		KafkaTemplate<String, List<Type>> kafkaTemplate = new KafkaTemplate<>(pf);
 		factory.getContainerProperties().setMissingTopicsFatal(false);
 		return kafkaTemplate;
 	}
-
 }
