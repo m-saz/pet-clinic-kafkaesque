@@ -22,8 +22,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.web.servlet.MockMvc;
 
-import no.group.petclinic.entity.Specialty;
-import no.group.petclinic.entity.Vet;
+import no.group.petclinic.dto.Specialty;
+import no.group.petclinic.dto.Vet;
 import no.group.petclinic.service.KafkaVetService;
 
 @WebMvcTest(VetController.class)

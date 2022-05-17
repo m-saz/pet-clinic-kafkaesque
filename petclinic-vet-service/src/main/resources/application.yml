@@ -1,21 +1,17 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/pet_clinic
+    url: jdbc:postgresql://localhost:5432/pet_clinic
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
     hikari:
       initialization-fail-timeout: 5000
   jpa:
+    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         formatSql: true
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: https://keycloak:8443/auth/realms/petclinic/protocol/openid-connect/certs
   kafka:
     bootstrap-servers:
     - kafka:9092
@@ -31,23 +27,6 @@ spring:
             trusted:
               packages: no.group.petclinic.*
       
-server:
-  port: 8444
-  error:
-    include-message: always
-  ssl:
-    key-store-type: PKCS12
-    key-store: classpath:petclinic.p12
-    key-store-password: petclinic
-    key-alias: petclinic
-    enabled: true
-    trust-store-type: PKCS12
-    trust-store: classpath:truststore.p12
-    trust-store-password: keycloak
-    
 kafka:
   group:
     id: pet-group
-    
-allowed:
-  origins: http://localhost:4200, https://localhost:4200

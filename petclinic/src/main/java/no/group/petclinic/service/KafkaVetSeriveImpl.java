@@ -5,13 +5,12 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import no.group.petclinic.entity.Vet;
+import no.group.petclinic.dto.Vet;
 import no.group.petclinic.exception.VetsNotFoundException;
 import no.group.petclinic.kafka.VetTopicConstants;
 

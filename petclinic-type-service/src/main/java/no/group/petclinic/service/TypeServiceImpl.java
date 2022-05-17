@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import no.group.petclinic.entity.Type;
 import no.group.petclinic.kafka.TypeTopicConstants;
-import no.group.petclinic.kafka.VetTopicConstants;
 import no.group.petclinic.repository.TypeRepository;
 
 @Service

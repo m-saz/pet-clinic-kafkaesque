@@ -17,6 +17,32 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/petclinic
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
+      
+  vet-service:
+    image: 'vet-service:latest'
+    build: ./petclinic-vet-service
+    depends_on:
+      - postgres
+      - zookeeper
+      - kafka
+    restart: unless-stopped
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/petclinic
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      
+  type-service:
+    image: 'type-service:latest'
+    build: ./petclinic-type-service
+    depends_on:
+      - postgres
+      - zookeeper
+      - kafka
+    restart: unless-stopped
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/petclinic
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
           
   postgres:
     image: 'postgres:${POSTGRES_VERSION}'
