@@ -35,7 +35,7 @@ public class Vet {
 	@Column(name = "last_name")
 	private String lastName;
 	
-	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinTable(name = "vet_specialties", joinColumns = @JoinColumn(name="vet_id"),
 			inverseJoinColumns = @JoinColumn(name="specialty_id"))
 	private Set<Specialty> specialties;

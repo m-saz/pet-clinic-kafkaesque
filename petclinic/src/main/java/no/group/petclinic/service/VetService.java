@@ -6,6 +6,6 @@ import no.group.petclinic.entity.Vet;
 
 public interface VetService {
 	
-	public List<Vet> getVets();
+	public void getVets(byte[] data);
 	
 }

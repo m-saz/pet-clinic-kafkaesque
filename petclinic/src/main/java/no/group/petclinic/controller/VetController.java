@@ -1,6 +1,7 @@
 package no.group.petclinic.controller;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,7 @@ public class VetController {
 	private final KafkaVetService vetService;
 	
 	@GetMapping
-	public ResponseEntity<List<Vet>> getVets(){
+	public ResponseEntity<List<Vet>> getVets() throws InterruptedException, ExecutionException{
 		List<Vet> vets = vetService.getVets();
 		return ResponseEntity.ok().body(vets);
 	}

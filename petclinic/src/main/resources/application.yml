@@ -20,9 +20,18 @@ spring:
   kafka:
     bootstrap-servers:
     - kafka:9092
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
-      group-id: petGroup
-
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: no.group.petclinic.*
+      
 server:
   port: 8444
   error:
@@ -37,6 +46,9 @@ server:
     trust-store: classpath:truststore.p12
     trust-store-password: keycloak
     
-
+kafka:
+  group:
+    id: pet-group
+    
 allowed:
   origins: http://localhost:4200, https://localhost:4200
