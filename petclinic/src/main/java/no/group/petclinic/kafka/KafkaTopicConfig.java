@@ -30,12 +30,12 @@ public class KafkaTopicConfig {
 	
 	@Bean
 	public NewTopic topic5() {
-		return TopicBuilder.name(OwnerTopicConstants.OWNERS).build();
+		return TopicBuilder.name(OwnerTopicConstants.OWNERS_GET).build();
 	}
 	
 	@Bean
 	public NewTopic topic6() {
-		return TopicBuilder.name(OwnerTopicConstants.OWNERS_REPLY).build();
+		return TopicBuilder.name(OwnerTopicConstants.OWNERS_GET_REPLY).build();
 	}
 
 }

@@ -10,7 +10,6 @@ services:
     depends_on:
       - postgres
       - zookeeper
-      - kafka
     restart: unless-stopped
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/petclinic
@@ -95,6 +94,7 @@ services:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
+      - app
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181

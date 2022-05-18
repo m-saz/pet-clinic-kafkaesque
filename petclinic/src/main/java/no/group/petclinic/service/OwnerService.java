@@ -13,12 +13,10 @@ public interface OwnerService {
 	
 	public void getOwners(OwnersPageRequest request, byte[] correlationId);
 	
-	public void saveOwner(Owner owner);
+	public void saveOrUpdateOwner(Owner owner, byte[] correlationId);
 
-	public Owner getOwner(Integer ownerId);
+	public void getOwner(Integer ownerId, byte[] correlationId);
 
 	public void deleteOwner(Integer ownerId);
 
-	public void updateOwner(Integer ownerId, Owner owner);
-	
 }

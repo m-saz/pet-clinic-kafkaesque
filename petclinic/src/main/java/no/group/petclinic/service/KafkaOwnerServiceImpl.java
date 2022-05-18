@@ -10,16 +10,19 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import no.group.petclinic.dto.OperationStatus;
 import no.group.petclinic.dto.OwnerSlim;
 import no.group.petclinic.dto.OwnersPageImpl;
 import no.group.petclinic.dto.OwnersPageRequest;
 import no.group.petclinic.entity.Owner;
+import no.group.petclinic.exception.OwnerNotFoundException;
 import no.group.petclinic.kafka.OwnerTopicConstants;
 
 @Service
@@ -27,6 +30,9 @@ import no.group.petclinic.kafka.OwnerTopicConstants;
 public class KafkaOwnerServiceImpl implements KafkaOwnerService{
 
 	private final ReplyingKafkaTemplate<String, OwnersPageRequest, OwnersPageImpl<OwnerSlim>> pagedOwnersTemplate;
+	private final ReplyingKafkaTemplate<String, Owner, OperationStatus> saveOwnerTemplate;
+	private final ReplyingKafkaTemplate<String, Integer, Owner> getSingleOwnerTemplate;
+	
 	private final Logger LOG = LoggerFactory.getLogger(getClass());
 	
 	@Override
@@ -34,7 +40,7 @@ public class KafkaOwnerServiceImpl implements KafkaOwnerService{
 		
 		OwnersPageRequest request = new OwnersPageRequest(keyword, page, size);
 		ProducerRecord<String, OwnersPageRequest> record =
-				new ProducerRecord<>(OwnerTopicConstants.OWNERS, request);
+				new ProducerRecord<>(OwnerTopicConstants.OWNERS_GET, request);
 		RequestReplyFuture<String, OwnersPageRequest, OwnersPageImpl<OwnerSlim>> future = 
 				pagedOwnersTemplate.sendAndReceive(record);
 		ConsumerRecord<String, OwnersPageImpl<OwnerSlim>> response = null;
@@ -51,33 +57,59 @@ public class KafkaOwnerServiceImpl implements KafkaOwnerService{
 	public OwnersPageImpl<OwnerSlim> getOwners(int page, int size) {
 		return getOwners(page, size, null);
 	}
-
-	@Override
-	public void saveOwner(Owner owner) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public Owner getOwner(Integer ownerId) {
-		// TODO Auto-generated method stub
-		return null;
+		ProducerRecord<String, Integer> record =
+				new ProducerRecord<>(OwnerTopicConstants.OWNER_GET_ONE, ownerId);
+		RequestReplyFuture<String, Integer, Owner> future =
+				getSingleOwnerTemplate.sendAndReceive(record);
+		ConsumerRecord<String, Owner> response = null;
+		try {
+			response = future.get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+		if(response.value() == null) {
+			throw new OwnerNotFoundException("Unable to find Owner with id: "+ownerId);
+		}
+		return response.value();
 	}
 
 	@Override
-	public void deleteOwner(Integer ownerId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void updateOwner(Integer ownerId, Owner owner) {
-		// TODO Auto-generated method stub
+	public OperationStatus saveOwner(Owner owner) {
+		ProducerRecord<String, Owner> record = 
+				new ProducerRecord<>(OwnerTopicConstants.OWNER_SAVE, owner);
+		RequestReplyFuture<String, Owner, OperationStatus> future =
+				saveOwnerTemplate.sendAndReceive(record);
+		ConsumerRecord<String, OperationStatus> response = null;
+		try {
+			response = future.get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+		LOG.info("{}", response.value().toString());
+		return response.value();
 		
 	}
 	
-	private OwnersPageImpl<OwnerSlim> fixOwnersMapping(OwnersPageImpl<OwnerSlim> owners) {
-		List tempList = owners.getContent();
+	@Override
+	public OperationStatus updateOwner(Integer ownerId, Owner owner) {
+		owner.setId(ownerId);
+		OperationStatus status = saveOwner(owner);
+		if(status == OperationStatus.ERROR) {
+			//Throw exception!!!!
+		}
+		return status;
+	}
+
+	@Override
+	public OperationStatus deleteOwner(Integer ownerId) {
+		return null;		
+	}
+
+	private OwnersPageImpl<OwnerSlim> fixOwnersMapping(OwnersPageImpl<OwnerSlim> brokenOwners) {
+		List tempList = brokenOwners.getContent();
 		List<OwnerSlim> ownerList = new ArrayList<>();
 		for(int i = 0; i<tempList.size(); i++) {
 			Map<String, Object> tempMap = (LinkedHashMap<String,Object>) tempList.get(i);
@@ -90,8 +122,8 @@ public class KafkaOwnerServiceImpl implements KafkaOwnerService{
 		}
 		OwnersPageImpl<OwnerSlim> result = new OwnersPageImpl<OwnerSlim>(
 										ownerList,
-										PageRequest.of(owners.getNumber(), owners.getSize()),
-										owners.getTotalElements());
+										PageRequest.of(brokenOwners.getNumber(), brokenOwners.getSize()),
+										brokenOwners.getTotalElements());
 		return result;
 	}
 

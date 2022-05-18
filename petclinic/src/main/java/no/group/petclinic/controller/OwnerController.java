@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import no.group.petclinic.dto.OperationStatus;
 import no.group.petclinic.dto.OwnerSlim;
-import no.group.petclinic.dto.OwnersPageImpl;
 import no.group.petclinic.entity.Owner;
 import no.group.petclinic.service.KafkaOwnerService;
 
@@ -76,20 +76,20 @@ public class OwnerController {
 	@PostMapping
 	public ResponseEntity processOwner(@RequestBody Owner owner) {
 		logger.info("{}",owner);
-		ownerService.saveOwner(owner);
+		OperationStatus status = ownerService.saveOwner(owner);
 		return ResponseEntity.noContent().build();
 	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity updateOwner(@PathVariable Integer id, @RequestBody Owner owner) {
 		logger.info("{} {}",id, owner);
-		ownerService.updateOwner(id, owner);
+		OperationStatus status = ownerService.updateOwner(id, owner);
 		return ResponseEntity.noContent().build();
 	}
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity deleteOwner(@PathVariable Integer id) {
-		ownerService.deleteOwner(id);
+		OperationStatus status = ownerService.deleteOwner(id);
 		return ResponseEntity.noContent().build();
 	}
 	
