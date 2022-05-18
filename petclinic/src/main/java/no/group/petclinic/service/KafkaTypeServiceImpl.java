@@ -23,10 +23,10 @@ public class KafkaTypeServiceImpl implements KafkaTypeService {
 	@Override
 	public List<Type> getTypes(){
 		ProducerRecord<String, String> record = 
-				new ProducerRecord<String, String>(TypeTopicConstants.GET_TYPES, null);
+				new ProducerRecord<>(TypeTopicConstants.TYPES, null);
 		RequestReplyFuture<String, String, List<Type>> future =
 				replyingKafkaTemplate.sendAndReceive(record);
-		ConsumerRecord<String, List<Type>> response;
+		ConsumerRecord<String, List<Type>> response = null;
 		try {
 			response = future.get();
 		} catch (InterruptedException | ExecutionException e) {

@@ -27,14 +27,14 @@ public class VetServiceImpl implements VetService {
 	private final KafkaTemplate<String, List<Vet>> kafkaTemplate;
 	
 	@Override
-	@KafkaListener(topics = VetTopicConstants.GET_VETS, groupId = "${kafka.group.id}")
+	@KafkaListener(topics = VetTopicConstants.VETS, groupId = "${kafka.group.id}")
 	public void getVets(@Header(KafkaHeaders.CORRELATION_ID) byte[] correlationId) {
 		
 		List<Vet> data = vetRepository.findAll();
 		
 		Message<List<Vet>> message = MessageBuilder
 				.withPayload(data)
-				.setHeader(KafkaHeaders.TOPIC, VetTopicConstants.GET_VETS_REPLY)
+				.setHeader(KafkaHeaders.TOPIC, VetTopicConstants.VETS_REPLY)
 				.setHeader(KafkaHeaders.CORRELATION_ID, correlationId)
 				.build();
 		kafkaTemplate.send(message);

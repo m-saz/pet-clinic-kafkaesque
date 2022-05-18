@@ -24,10 +24,10 @@ public class KafkaVetSeriveImpl implements KafkaVetService {
 	public List<Vet> getVets(){
 		
 		ProducerRecord<String, String> record = 
-				new ProducerRecord<String, String>(VetTopicConstants.GET_VETS, null);
+				new ProducerRecord<>(VetTopicConstants.VETS, null);
 		RequestReplyFuture<String, String, List<Vet>> future =
 				replyingKafkaTemplate.sendAndReceive(record);
-		ConsumerRecord<String, List<Vet>> response;
+		ConsumerRecord<String, List<Vet>> response = null;
 		try {
 			response = future.get();
 		} catch (InterruptedException | ExecutionException e) {

@@ -25,7 +25,7 @@ public class KafkaTypesTemplateConfig {
 			ConcurrentKafkaListenerContainerFactory<String, List<Type>> factory){
 		
 		ConcurrentMessageListenerContainer<String, List<Type>> repliesContainer =
-				factory.createContainer(TypeTopicConstants.GET_TYPES_REPLY);
+				factory.createContainer(TypeTopicConstants.TYPES_REPLY);
 		repliesContainer.getContainerProperties().setMissingTopicsFatal(false);
 		repliesContainer.getContainerProperties().setGroupId(groupId);
 		return new ReplyingKafkaTemplate<String, String, List<Type>>(pf, repliesContainer);

@@ -1,20 +1,28 @@
 package no.group.petclinic.service;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import no.group.petclinic.dto.OwnerSlim;
+import no.group.petclinic.dto.OwnersPageRequest;
+import no.group.petclinic.dto.OwnersPageImpl;
 import no.group.petclinic.entity.Owner;
 import no.group.petclinic.entity.Pet;
 import no.group.petclinic.entity.Visit;
 import no.group.petclinic.exception.OwnerNotFoundException;
+import no.group.petclinic.kafka.OwnerTopicConstants;
 import no.group.petclinic.repository.OwnerRepository;
 
 @Service
@@ -22,17 +30,32 @@ import no.group.petclinic.repository.OwnerRepository;
 public class OwnerServiceImpl implements OwnerService {
 
 	private final OwnerRepository ownerRepository;
-
-	@Override
-	public Page<OwnerSlim> getOwners(Pageable pageable) {
-		return ownerRepository.findAllOwners(pageable);
+	private final KafkaTemplate<String, OwnersPageImpl<OwnerSlim>> pagedTemplate;
+	
+	@KafkaListener(topics = OwnerTopicConstants.OWNERS, groupId = "${kafka.group.id}")
+	public void getOwners(OwnersPageRequest request, 
+						@Header(KafkaHeaders.CORRELATION_ID) byte[] correlationId) {
+		
+		Page<OwnerSlim> owners = null;
+		Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+		
+		if(request.getKeyword() == null) {
+			owners = ownerRepository.findAllOwners(pageable);
+		} else {
+			owners = ownerRepository.findOwnersByFirstNameOrLastName(
+										request.getKeyword(), pageable);
+		}
+		
+		OwnersPageImpl<OwnerSlim> payload = new OwnersPageImpl<OwnerSlim>(owners);
+		
+		Message<OwnersPageImpl<OwnerSlim>> message = MessageBuilder
+				.withPayload(payload)
+				.setHeader(KafkaHeaders.TOPIC, OwnerTopicConstants.OWNERS_REPLY)
+				.setHeader(KafkaHeaders.CORRELATION_ID, correlationId)
+				.build();
+		pagedTemplate.send(message);
 	}
 	
-	@Override
-	public Page<OwnerSlim> searchOwners(String keyword, Pageable pageable) {
-		return ownerRepository.findOwnersByFirstNameOrLastName(keyword, pageable);
-	}
-
 	@Override
 	@Transactional
 	public void saveOwner(Owner owner) {
@@ -43,11 +66,10 @@ public class OwnerServiceImpl implements OwnerService {
 	}
 
 	@Override
-	public Owner getOwner(String ownerId) {
+	public Owner getOwner(Integer ownerId) {
 		Owner owner = null;
 		try {
-			Integer id = Integer.parseInt(ownerId);
-			owner = ownerRepository.findById(id).get();
+			owner = ownerRepository.findById(ownerId).get();
 		}
 		catch(NoSuchElementException|NumberFormatException e) {
 			throw new OwnerNotFoundException("Can't find Owner with id: "+ownerId);
@@ -57,14 +79,14 @@ public class OwnerServiceImpl implements OwnerService {
 	}
 
 	@Override
-	public void deleteOwner(String ownerId) {
+	public void deleteOwner(Integer ownerId) {
 		Owner existingOwner = getOwner(ownerId);
 		ownerRepository.deleteById(existingOwner.getId());
 	}
 
 	@Override
 	@Transactional
-	public void updateOwner(String ownerId, Owner owner) {
+	public void updateOwner(Integer ownerId, Owner owner) {
 		Owner existingOwner = getOwner(ownerId);
 		
 		owner.setId(existingOwner.getId());

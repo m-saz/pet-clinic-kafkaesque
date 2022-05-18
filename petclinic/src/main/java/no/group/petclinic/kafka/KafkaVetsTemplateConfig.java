@@ -24,7 +24,7 @@ public class KafkaVetsTemplateConfig {
 			ConcurrentKafkaListenerContainerFactory<String, List<Vet>> factory){
 		
 		ConcurrentMessageListenerContainer<String, List<Vet>> repliesContainer =
-				factory.createContainer(VetTopicConstants.GET_VETS_REPLY);
+				factory.createContainer(VetTopicConstants.VETS_REPLY);
 		repliesContainer.getContainerProperties().setMissingTopicsFatal(false);
 		repliesContainer.getContainerProperties().setGroupId(groupId);
 		return new ReplyingKafkaTemplate<String, String, List<Vet>>(pf, repliesContainer);

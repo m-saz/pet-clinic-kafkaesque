@@ -9,7 +9,6 @@ services:
       - 8444:8444
     depends_on:
       - postgres
-      - keycloak
       - zookeeper
       - kafka
     restart: unless-stopped
@@ -25,6 +24,7 @@ services:
       - postgres
       - zookeeper
       - kafka
+      - app
     restart: unless-stopped
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/petclinic
@@ -38,6 +38,7 @@ services:
       - postgres
       - zookeeper
       - kafka
+      - app
     restart: unless-stopped
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/petclinic

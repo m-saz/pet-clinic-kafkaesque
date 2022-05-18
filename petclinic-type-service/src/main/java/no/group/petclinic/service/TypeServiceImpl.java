@@ -23,14 +23,14 @@ public class TypeServiceImpl implements TypeService {
 	private final KafkaTemplate<String, List<Type>> kafkaTemplate;
 	
 	@Override
-	@KafkaListener(topics = TypeTopicConstants.GET_TYPES, groupId = "${kafka.group.id}")
+	@KafkaListener(topics = TypeTopicConstants.TYPES, groupId = "${kafka.group.id}")
 	public void getTypes(@Header(KafkaHeaders.CORRELATION_ID) byte[] correlationId) {
 		
 		List<Type> data = typeRepository.findAll();
 		
 		Message<List<Type>> message = MessageBuilder
 				.withPayload(data)
-				.setHeader(KafkaHeaders.TOPIC, TypeTopicConstants.GET_TYPES_REPLY)
+				.setHeader(KafkaHeaders.TOPIC, TypeTopicConstants.TYPES_REPLY)
 				.setHeader(KafkaHeaders.CORRELATION_ID, correlationId)
 				.build();
 		kafkaTemplate.send(message);

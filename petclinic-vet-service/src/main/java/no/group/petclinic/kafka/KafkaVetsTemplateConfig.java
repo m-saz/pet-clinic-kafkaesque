@@ -15,9 +15,6 @@ import no.group.petclinic.entity.Vet;
 
 @Configuration
 public class KafkaVetsTemplateConfig {
-	
-	@Value("${kafka.group.id}")
-	private String groupId;
 
 	@Bean
 	public KafkaTemplate<String, List<Vet>> vetsTemplate(ProducerFactory<String,List<Vet>> pf,
