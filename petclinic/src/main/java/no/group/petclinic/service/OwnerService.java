@@ -17,6 +17,6 @@ public interface OwnerService {
 
 	public void getOwner(Integer ownerId, byte[] correlationId);
 
-	public void deleteOwner(Integer ownerId);
+	public void deleteOwner(Integer ownerId, byte[] correlationId);
 
 }

@@ -58,6 +58,18 @@ public class KafkaOwnersTemplateConfig {
 	}
 	
 	@Bean
+	public ReplyingKafkaTemplate<String, Integer, OperationStatus> deleteOwnerReplyingTemplate(
+			ProducerFactory<String, Integer> pf,
+			ConcurrentKafkaListenerContainerFactory<String, OperationStatus> factory){
+		
+		ConcurrentMessageListenerContainer<String, OperationStatus> repliesContainer =
+				factory.createContainer(OwnerTopicConstants.OWNER_DELETE_REPLY);
+		repliesContainer.getContainerProperties().setMissingTopicsFatal(false);
+		repliesContainer.getContainerProperties().setGroupId(groupId);
+		return new ReplyingKafkaTemplate<String, Integer, OperationStatus>(pf, repliesContainer);
+	}
+	
+	@Bean
 	public KafkaTemplate<String, OwnersPageImpl<OwnerSlim>> getOwnersReplyTemplate(
 			ProducerFactory<String,OwnersPageImpl<OwnerSlim>> pf,
 			ConcurrentKafkaListenerContainerFactory<String, OwnersPageImpl<OwnerSlim>> factory){

@@ -29,9 +29,10 @@ import no.group.petclinic.kafka.OwnerTopicConstants;
 @RequiredArgsConstructor
 public class KafkaOwnerServiceImpl implements KafkaOwnerService{
 
-	private final ReplyingKafkaTemplate<String, OwnersPageRequest, OwnersPageImpl<OwnerSlim>> pagedOwnersTemplate;
+	private final ReplyingKafkaTemplate<String, OwnersPageRequest, OwnersPageImpl<OwnerSlim>> getPagedOwnersTemplate;
 	private final ReplyingKafkaTemplate<String, Owner, OperationStatus> saveOwnerTemplate;
 	private final ReplyingKafkaTemplate<String, Integer, Owner> getSingleOwnerTemplate;
+	private final ReplyingKafkaTemplate<String, Integer, OperationStatus> deleteOwnerTemplate;
 	
 	private final Logger LOG = LoggerFactory.getLogger(getClass());
 	
@@ -42,7 +43,7 @@ public class KafkaOwnerServiceImpl implements KafkaOwnerService{
 		ProducerRecord<String, OwnersPageRequest> record =
 				new ProducerRecord<>(OwnerTopicConstants.OWNERS_GET, request);
 		RequestReplyFuture<String, OwnersPageRequest, OwnersPageImpl<OwnerSlim>> future = 
-				pagedOwnersTemplate.sendAndReceive(record);
+				getPagedOwnersTemplate.sendAndReceive(record);
 		ConsumerRecord<String, OwnersPageImpl<OwnerSlim>> response = null;
 		try {
 			response = future.get();
@@ -98,14 +99,29 @@ public class KafkaOwnerServiceImpl implements KafkaOwnerService{
 		owner.setId(ownerId);
 		OperationStatus status = saveOwner(owner);
 		if(status == OperationStatus.ERROR) {
-			//Throw exception!!!!
+			throw new OwnerNotFoundException("Unable to find Owner with id: "+ownerId);
 		}
 		return status;
 	}
 
 	@Override
 	public OperationStatus deleteOwner(Integer ownerId) {
-		return null;		
+		ProducerRecord<String, Integer> record = 
+				new ProducerRecord<>(OwnerTopicConstants.OWNER_DELETE, ownerId);
+		RequestReplyFuture<String, Integer, OperationStatus> future =
+				deleteOwnerTemplate.sendAndReceive(record);
+		ConsumerRecord<String, OperationStatus> response = null;
+		try {
+			response = future.get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+		OperationStatus status = response.value();
+		if(status == OperationStatus.ERROR) {
+			throw new OwnerNotFoundException("Unable to find Owner with id: "+ownerId);
+		}
+		LOG.info("{}", status);
+		return status;
 	}
 
 	private OwnersPageImpl<OwnerSlim> fixOwnersMapping(OwnersPageImpl<OwnerSlim> brokenOwners) {

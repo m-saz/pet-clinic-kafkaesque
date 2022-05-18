@@ -106,8 +106,8 @@ public class OwnerServiceImpl implements OwnerService {
 		try {
 			owner = ownerRepository.findById(ownerId).get();
 		}
-		catch(NoSuchElementException|NumberFormatException e) {
-			e.printStackTrace();;
+		catch(NoSuchElementException e) {
+			e.printStackTrace();
 		}
 		
 		Message<Owner> message = MessageBuilder
@@ -119,9 +119,25 @@ public class OwnerServiceImpl implements OwnerService {
 	}
 
 	@Override
-	public void deleteOwner(Integer ownerId) {
-		Owner existingOwner = new Owner();
-		ownerRepository.deleteById(existingOwner.getId());
+	@KafkaListener(topics = OwnerTopicConstants.OWNER_DELETE, groupId = "${kafka.group.id}")
+	public void deleteOwner(Integer ownerId,
+							@Header(KafkaHeaders.CORRELATION_ID) byte[] correlationId) {
+		OperationStatus status = OperationStatus.OK;
+		Owner existingOwner = null;
+		try {
+			existingOwner = ownerRepository.findById(ownerId).get();
+			ownerRepository.deleteById(existingOwner.getId());
+		}
+		catch(NoSuchElementException e) {
+			status = OperationStatus.ERROR;
+		}
+		
+		Message<OperationStatus> message = MessageBuilder
+				.withPayload(status)
+				.setHeader(KafkaHeaders.TOPIC, OwnerTopicConstants.OWNER_DELETE_REPLY)
+				.setHeader(KafkaHeaders.CORRELATION_ID, correlationId)
+				.build();
+		statusTemplate.send(message);
 	}
 
 	private static void setForeignKeys(Owner owner) {
