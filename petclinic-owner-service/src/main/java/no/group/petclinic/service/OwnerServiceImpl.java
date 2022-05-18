@@ -2,7 +2,6 @@ package no.group.petclinic.service;
 
 import java.util.NoSuchElementException;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,23 +22,12 @@ import no.group.petclinic.dto.OwnersPageRequest;
 import no.group.petclinic.entity.Owner;
 import no.group.petclinic.entity.Pet;
 import no.group.petclinic.entity.Visit;
-import no.group.petclinic.exception.OwnerNotFoundException;
 import no.group.petclinic.kafka.OwnerTopicConstants;
 import no.group.petclinic.repository.OwnerRepository;
 
 @Service
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public class OwnerServiceImpl implements OwnerService {
-
-	public OwnerServiceImpl(OwnerRepository ownerRepository,
-			KafkaTemplate<String, OwnersPageImpl<OwnerSlim>> pagedTemplate,
-			KafkaTemplate<String, OperationStatus> statusTemplate,
-			@Qualifier("getOne") KafkaTemplate<String, Owner> ownerTemplate) {
-		this.ownerRepository = ownerRepository;
-		this.pagedTemplate = pagedTemplate;
-		this.statusTemplate = statusTemplate;
-		this.ownerTemplate = ownerTemplate;
-	}
 
 	private final OwnerRepository ownerRepository;
 	private final KafkaTemplate<String, OwnersPageImpl<OwnerSlim>> pagedTemplate;

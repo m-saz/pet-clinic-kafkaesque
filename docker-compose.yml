@@ -3,18 +3,13 @@ version: '3.8'
 services:
   app:
     image: 'petclinic:latest'
-    build:
-      context: ./petclinic
+    build: ./petclinic
     ports:
       - 8444:8444
     depends_on:
-      - postgres
       - zookeeper
+      - kafka
     restart: unless-stopped
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/petclinic
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
       
   vet-service:
     image: 'vet-service:latest'
@@ -43,6 +38,20 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/petclinic
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
+      
+  owner-service:
+    image: 'owner-service:latest'
+    build: ./petclinic-owner-service
+    depends_on:
+      - postgres
+      - zookeeper
+      - kafka
+      - app
+    restart: unless-stopped
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/petclinic
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres    
           
   postgres:
     image: 'postgres:${POSTGRES_VERSION}'
@@ -94,7 +103,6 @@ services:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
-      - app
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181

@@ -1,7 +1,5 @@
 package no.group.petclinic.dto;
 
-import org.springframework.data.domain.PageRequest;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

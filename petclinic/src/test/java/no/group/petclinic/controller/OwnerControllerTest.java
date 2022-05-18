@@ -28,8 +28,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import no.group.petclinic.dto.Pet;
 import no.group.petclinic.entity.Owner;
-import no.group.petclinic.entity.Pet;
 import no.group.petclinic.service.KafkaOwnerService;
 
 @WebMvcTest(OwnerController.class)

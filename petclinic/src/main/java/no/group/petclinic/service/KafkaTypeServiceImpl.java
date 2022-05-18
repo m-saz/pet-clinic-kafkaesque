@@ -10,7 +10,7 @@ import org.springframework.kafka.requestreply.RequestReplyFuture;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import no.group.petclinic.entity.Type;
+import no.group.petclinic.dto.Type;
 import no.group.petclinic.exception.TypesNotFoundException;
 import no.group.petclinic.kafka.TypeTopicConstants;
 
