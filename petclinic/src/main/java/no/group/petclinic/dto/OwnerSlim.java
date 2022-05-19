@@ -10,17 +10,14 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Relation(collectionRelation = "owners")
 public class OwnerSlim extends EntityModel<OwnerSlim>{
 	
 	private Integer id;
-	
 	private String firstName;
-	
 	private String lastName;
-	
 	private String phoneNumber;
-	
 	private String email;
 
 }

@@ -10,6 +10,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
@@ -28,7 +29,7 @@ import no.group.petclinic.kafka.OwnerTopicConstants;
 @RequiredArgsConstructor
 public class KafkaOwnerServiceImpl implements KafkaOwnerService{
 
-	private final ReplyingKafkaTemplate<String, OwnersPageRequest, OwnersPageImpl<OwnerSlim>> getPagedOwnersTemplate;
+	private final ReplyingKafkaTemplate<String, OwnersPageRequest, Page<OwnerSlim>> getPagedOwnersTemplate;
 	private final ReplyingKafkaTemplate<String, Owner, OperationStatus> saveOwnerTemplate;
 	private final ReplyingKafkaTemplate<String, Integer, Owner> getSingleOwnerTemplate;
 	private final ReplyingKafkaTemplate<String, Integer, OperationStatus> deleteOwnerTemplate;
@@ -36,25 +37,24 @@ public class KafkaOwnerServiceImpl implements KafkaOwnerService{
 	private final Logger LOG = LoggerFactory.getLogger(getClass());
 	
 	@Override
-	public OwnersPageImpl<OwnerSlim> getOwners(int page, int size, String keyword) {
+	public Page<OwnerSlim> getOwners(int page, int size, String keyword) {
 		
 		OwnersPageRequest request = new OwnersPageRequest(keyword, page, size);
 		ProducerRecord<String, OwnersPageRequest> record =
 				new ProducerRecord<>(OwnerTopicConstants.OWNERS_GET, request);
-		RequestReplyFuture<String, OwnersPageRequest, OwnersPageImpl<OwnerSlim>> future = 
+		RequestReplyFuture<String, OwnersPageRequest, Page<OwnerSlim>> future = 
 				getPagedOwnersTemplate.sendAndReceive(record);
-		ConsumerRecord<String, OwnersPageImpl<OwnerSlim>> response = null;
+		ConsumerRecord<String, Page<OwnerSlim>> response = null;
 		try {
 			response = future.get();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
-		OwnersPageImpl<OwnerSlim> owners = fixOwnersMapping(response.value());
-		return owners;
+		return response.value();
 	}
 	
 	@Override
-	public OwnersPageImpl<OwnerSlim> getOwners(int page, int size) {
+	public Page<OwnerSlim> getOwners(int page, int size) {
 		return getOwners(page, size, null);
 	}
 	
@@ -123,23 +123,23 @@ public class KafkaOwnerServiceImpl implements KafkaOwnerService{
 		return status;
 	}
 
-	private OwnersPageImpl<OwnerSlim> fixOwnersMapping(OwnersPageImpl<OwnerSlim> brokenOwners) {
-		List tempList = brokenOwners.getContent();
-		List<OwnerSlim> ownerList = new ArrayList<>();
-		for(int i = 0; i<tempList.size(); i++) {
-			Map<String, Object> tempMap = (LinkedHashMap<String,Object>) tempList.get(i);
-			ownerList.add(new OwnerSlim(
-					(Integer) tempMap.get("id"), 
-					(String) tempMap.get("firstName"), 
-					(String) tempMap.get("lastName"), 
-					(String) tempMap.get("phoneNumber"), 
-					(String) tempMap.get("email")));
-		}
-		OwnersPageImpl<OwnerSlim> result = new OwnersPageImpl<OwnerSlim>(
-										ownerList,
-										PageRequest.of(brokenOwners.getNumber(), brokenOwners.getSize()),
-										brokenOwners.getTotalElements());
-		return result;
-	}
+//	private OwnersPageImpl<OwnerSlim> fixOwnersMapping(OwnersPageImpl<OwnerSlim> brokenOwners) {
+//		List tempList = brokenOwners.getContent();
+//		List<OwnerSlim> ownerList = new ArrayList<>();
+//		for(int i = 0; i<tempList.size(); i++) {
+//			Map<String, Object> tempMap = (LinkedHashMap<String,Object>) tempList.get(i);
+//			ownerList.add(new OwnerSlim(
+//					(Integer) tempMap.get("id"), 
+//					(String) tempMap.get("firstName"), 
+//					(String) tempMap.get("lastName"), 
+//					(String) tempMap.get("phoneNumber"), 
+//					(String) tempMap.get("email")));
+//		}
+//		OwnersPageImpl<OwnerSlim> result = new OwnersPageImpl<OwnerSlim>(
+//										ownerList,
+//										PageRequest.of(brokenOwners.getNumber(), brokenOwners.getSize()),
+//										brokenOwners.getTotalElements());
+//		return result;
+//	}
 
 }

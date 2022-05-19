@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import no.group.petclinic.dto.OperationStatus;
 import no.group.petclinic.dto.OwnerSlim;
-import no.group.petclinic.dto.OwnersPageImpl;
 import no.group.petclinic.dto.OwnersPageRequest;
 import no.group.petclinic.entity.Owner;
 import no.group.petclinic.entity.Pet;
@@ -30,7 +29,7 @@ import no.group.petclinic.repository.OwnerRepository;
 public class OwnerServiceImpl implements OwnerService {
 
 	private final OwnerRepository ownerRepository;
-	private final KafkaTemplate<String, OwnersPageImpl<OwnerSlim>> pagedTemplate;
+	private final KafkaTemplate<String, Page<OwnerSlim>> pagedTemplate;
 	private final KafkaTemplate<String, OperationStatus> statusTemplate;
 	private final KafkaTemplate<String, Owner> ownerTemplate;
 	
@@ -48,10 +47,8 @@ public class OwnerServiceImpl implements OwnerService {
 										request.getKeyword(), pageable);
 		}
 		
-		OwnersPageImpl<OwnerSlim> payload = new OwnersPageImpl<OwnerSlim>(owners);
-		
-		Message<OwnersPageImpl<OwnerSlim>> message = MessageBuilder
-				.withPayload(payload)
+		Message<Page<OwnerSlim>> message = MessageBuilder
+				.withPayload(owners)
 				.setHeader(KafkaHeaders.TOPIC, OwnerTopicConstants.OWNERS_GET_REPLY)
 				.setHeader(KafkaHeaders.CORRELATION_ID, correlationId)
 				.build();
