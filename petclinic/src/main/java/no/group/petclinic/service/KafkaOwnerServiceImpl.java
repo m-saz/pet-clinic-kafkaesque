@@ -1,9 +1,5 @@
 package no.group.petclinic.service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -11,7 +7,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
 import org.springframework.stereotype.Service;
@@ -19,7 +14,6 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import no.group.petclinic.dto.OperationStatus;
 import no.group.petclinic.dto.OwnerSlim;
-import no.group.petclinic.dto.OwnersPageImpl;
 import no.group.petclinic.dto.OwnersPageRequest;
 import no.group.petclinic.entity.Owner;
 import no.group.petclinic.exception.OwnerNotFoundException;
@@ -122,24 +116,5 @@ public class KafkaOwnerServiceImpl implements KafkaOwnerService{
 		LOG.info("{}", status);
 		return status;
 	}
-
-//	private OwnersPageImpl<OwnerSlim> fixOwnersMapping(OwnersPageImpl<OwnerSlim> brokenOwners) {
-//		List tempList = brokenOwners.getContent();
-//		List<OwnerSlim> ownerList = new ArrayList<>();
-//		for(int i = 0; i<tempList.size(); i++) {
-//			Map<String, Object> tempMap = (LinkedHashMap<String,Object>) tempList.get(i);
-//			ownerList.add(new OwnerSlim(
-//					(Integer) tempMap.get("id"), 
-//					(String) tempMap.get("firstName"), 
-//					(String) tempMap.get("lastName"), 
-//					(String) tempMap.get("phoneNumber"), 
-//					(String) tempMap.get("email")));
-//		}
-//		OwnersPageImpl<OwnerSlim> result = new OwnersPageImpl<OwnerSlim>(
-//										ownerList,
-//										PageRequest.of(brokenOwners.getNumber(), brokenOwners.getSize()),
-//										brokenOwners.getTotalElements());
-//		return result;
-//	}
 
 }
